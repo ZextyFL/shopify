@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shopify Notifications</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 60px;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Shopify Notification Demo</h1>
+<button onclick="startNotifications()">Enable Notifications</button>
+
+<script>
+  let intervalId = null;
+
+  function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function randomPrice(min, max) {
+    return (Math.random() * (max - min) + min).toFixed(2);
+  }
+
+  function sendNotification() {
+    const items = randomInt(1, 10);
+    const price = randomPrice(10, 500);
+
+    new Notification("Shopify", {
+      body: `ICON has a new order for ${items} items\ntotaling $${price} from Online Store`,
+      icon: "https://files.catbox.moe/roso7g.png"
+    });
+  }
+
+  function startNotifications() {
+    if (!("Notification" in window)) {
+      alert("Notifications are not supported on this browser.");
+      return;
+    }
+
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        if (intervalId === null) {
+          sendNotification();
+          intervalId = setInterval(sendNotification, 3000);
+        }
+      } else {
+        alert("Notification permission denied.");
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
