@@ -2,63 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Shopify Notifications</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 60px;
-    }
-    button {
-      font-size: 18px;
-      padding: 12px 20px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
+  <title>Shopify</title>
 
-<h1>Shopify Notification Demo</h1>
-<button onclick="startNotifications()">Enable Notifications</button>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://files.catbox.moe/roso7g.png">
+</head>
+<body style="font-family: Arial; text-align:center; margin-top:50px;">
+
+<h1>Shopify</h1>
+<button id="enable">Enable Notifications</button>
 
 <script>
-  let intervalId = null;
-
-  function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
   }
 
-  function randomPrice(min, max) {
-    return (Math.random() * (max - min) + min).toFixed(2);
-  }
-
-  function sendNotification() {
-    const items = randomInt(1, 10);
-    const price = randomPrice(10, 500);
-
-    new Notification("Shopify", {
-      body: `ICON has a new order for ${items} items\ntotaling $${price} from Online Store`,
-      icon: "https://files.catbox.moe/roso7g.png"
-    });
-  }
-
-  function startNotifications() {
-    if (!("Notification" in window)) {
-      alert("Notifications are not supported on this browser.");
+  document.getElementById('enable').onclick = async () => {
+    if (!('Notification' in window)) {
+      alert('Notifications not supported');
       return;
     }
 
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        if (intervalId === null) {
-          sendNotification();
-          intervalId = setInterval(sendNotification, 3000);
-        }
-      } else {
-        alert("Notification permission denied.");
-      }
-    });
-  }
+    const permission = await Notification.requestPermission();
+    alert('Permission: ' + permission);
+  };
 </script>
 
 </body>
