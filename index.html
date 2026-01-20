@@ -1,50 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Shopify Notification Test</title>
-  <style>
-    body { font-family: Arial; background:#f5f5f5; }
-    .notif {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-      padding: 15px;
-      width: 280px;
-      animation: slide 0.4s ease;
-    }
-    @keyframes slide {
-      from { transform: translateX(100%); opacity:0 }
-      to { transform: translateX(0); opacity:1 }
-    }
-    img { width: 40px; height: 40px; float:left; margin-right:10px }
-    h4 { margin:0; }
-    p { margin:5px 0 0; font-size:14px }
-  </style>
+  <meta charset="UTF-8">
+  <title>Shopify Discord Webhook Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
+<body style="font-family:Arial; text-align:center; margin-top:40px;">
+
+<h2>Shopify → Discord Webhook Simulator</h2>
+<p>Sending order notifications every 3 seconds…</p>
 
 <script>
-function showNotification() {
-  const items = Math.floor(Math.random()*10)+1;
-  const price = (Math.random()*500+10).toFixed(2);
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1463114856319291447/Sw18x-T-6Mrc9wTR2UTT5IqgaoL8V7yDgd2Grjwa0XRQ4wWfBjjRBrGU9qF2IruPwurE";
 
-  const div = document.createElement('div');
-  div.className = 'notif';
-  div.innerHTML = `
-    <img src="https://files.catbox.moe/roso7g.png">
-    <h4>Shopify</h4>
-    <p>ICON has a new order for ${items} items<br>
-    totaling $${price} from Online Store</p>
-  `;
-  document.body.appendChild(div);
+const STORES = [
+  "Vanoak",
+  "Maseer",
+  "Amlore",
+  "Cleens",
+  "Legend London",
+  "Manfield",
+  "GENTS.NL"
+];
 
-  setTimeout(() => div.remove(), 2500);
+const ICON_URL = "https://files.catbox.moe/roso7g.png";
+
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-setInterval(showNotification, 3000);
+function randPrice(min, max) {
+  return (Math.random() * (max - min) + min).toFixed(2);
+}
+
+async function sendDiscordWebhook() {
+  const store = STORES[Math.floor(Math.random() * STORES.length)];
+  const items = rand(1, 10);
+  const total = randPrice(15, 500);
+
+  const payload = {
+    username: "Shopify",
+    avatar_url: ICON_URL,
+    embeds: [
+      {
+        title: "🛒 New Order",
+        description: `**${store}** has a new order`,
+        color: 5763719,
+        thumbnail: { url: ICON_URL },
+        fields: [
+          { name: "Items", value: `${items}`, inline: true },
+          { name: "Total", value: `$${total}`, inline: true },
+          { name: "Source", value: "Online Store", inline: false }
+        ],
+        footer: {
+          text: "Shopify Webhook Test"
+        },
+        timestamp: new Date().toISOString()
+      }
+    ]
+  };
+
+  try {
+    await fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    console.log("Sent:", store, items, total);
+  } catch (e) {
+    console.error("Webhook error", e);
+  }
+}
+
+setInterval(sendDiscordWebhook, 3000);
 </script>
 
 </body>
